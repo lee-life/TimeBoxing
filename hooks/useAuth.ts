@@ -141,7 +141,8 @@ export const useAuth = () => {
         email,
         password,
         options: {
-          data: { fighter_name: fighterName }
+          data: { fighter_name: fighterName },
+          emailRedirectTo: undefined // Skip email confirmation
         }
       });
 
