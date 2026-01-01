@@ -220,7 +220,7 @@ export const useAuth = () => {
     }
 
     // For Supabase, convert to email format
-    const email = `${fighterName.toLowerCase().replace(/\s+/g, '_')}@timefighter.local`;
+    const email = `${fighterName.toLowerCase().replace(/\s+/g, '_')}@timefighter.app`;
     
     // Try sign in first
     const signInResult = await signIn(email, code);
