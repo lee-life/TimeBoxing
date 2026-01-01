@@ -958,9 +958,11 @@ const App: React.FC = () => {
                                     }}
                                     className={`relative w-7 h-7 md:w-8 md:h-8 cursor-pointer group hover:bg-gray-100 rounded-full transition-colors ${isWeeklyMode ? 'opacity-40 cursor-default' : ''}`}
                                 >
-                                    <span className={`absolute inset-0 flex items-center justify-center font-russo text-xs md:text-sm z-10 transition-colors ${isSelected ? 'text-black' : 'text-gray-400 group-hover:text-gray-600'}`}>{d}</span>
+                                    <div className={`absolute inset-0 flex items-center justify-center font-russo text-xs md:text-sm z-10 transition-colors ${isSelected ? 'text-black' : 'text-gray-400 group-hover:text-gray-600'}`}>
+                                      {d}
+                                    </div>
                                     {isSelected && (
-                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full border-[2px] md:border-[3px] border-black rounded-full transform -rotate-12"></div>
+                                        <div className="absolute inset-0 border-[2px] md:border-[3px] border-black rounded-full transform -rotate-12"></div>
                                     )}
                                 </div>
                             );

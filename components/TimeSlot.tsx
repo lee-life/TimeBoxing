@@ -84,12 +84,12 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                   if (onEdit) onEdit(block);
                 }}
             >
-                {/* Text styling: natural wrapping with adequate space */}
+                {/* Text styling: compact display to fit within block */}
                 <div 
-                  className="font-pen text-gray-900 text-center select-none px-1.5 py-1"
+                  className="font-pen text-gray-900 text-center select-none"
                   style={{
-                    fontSize: window.innerWidth < 768 ? '0.7rem' : '0.9rem',
-                    lineHeight: '1.25',
+                    fontSize: '0.65rem',
+                    lineHeight: '1.2',
                     wordBreak: 'keep-all',
                     overflowWrap: 'anywhere',
                     whiteSpace: 'normal',
@@ -97,7 +97,8 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                     height: '100%',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    padding: '2px 4px'
                   }}
                 >
                   {block.title}
