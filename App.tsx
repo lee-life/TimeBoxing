@@ -203,49 +203,49 @@ const App: React.FC = () => {
     const sampleBlocks: ScheduledBlock[] = [
       {
         id: `sample-1-${Date.now()}`,
-        title: '모닝 루틴 및 운동',
+        title: '모닝루틴',
         startTime: '06:00',
         duration: 90,
         color: 'health'
       },
       {
         id: `sample-2-${Date.now()}`,
-        title: '이메일 확인 및 하루 계획',
+        title: '이메일',
         startTime: '09:00',
         duration: 30,
         color: 'work'
       },
       {
         id: `sample-3-${Date.now()}`,
-        title: '프로젝트 기획서 작성',
+        title: '기획서작성',
         startTime: '09:30',
         duration: 120,
         color: 'work'
       },
       {
         id: `sample-4-${Date.now()}`,
-        title: '점심 식사',
+        title: '점심',
         startTime: '12:00',
         duration: 60,
         color: 'health'
       },
       {
         id: `sample-5-${Date.now()}`,
-        title: '클라이언트 미팅',
+        title: '미팅',
         startTime: '15:00',
         duration: 60,
         color: 'work'
       },
       {
         id: `sample-6-${Date.now()}`,
-        title: '코드 리뷰 및 개발',
+        title: '코드리뷰',
         startTime: '16:00',
         duration: 120,
         color: 'learning'
       },
       {
         id: `sample-7-${Date.now()}`,
-        title: '주간 회고 작성',
+        title: '회고',
         startTime: '18:30',
         duration: 30,
         color: 'learning'
@@ -546,6 +546,13 @@ const App: React.FC = () => {
 
   const handleSaveBlock = () => {
     if (!currentBlockStart || !newBlockTitle) return;
+
+    // Character limit based on block duration
+    const maxChars = Math.floor(newBlockDuration / 10); // ~6 chars per 60 min block
+    if (newBlockTitle.length > maxChars) {
+      alert(`텍스트가 너무 깁니다!\n최대 ${maxChars}자까지 입력 가능합니다.\n(현재: ${newBlockTitle.length}자)\n\n블록 시간을 늘리거나 텍스트를 줄여주세요.`);
+      return;
+    }
 
     const newBlock: ScheduledBlock = {
       id: editingBlockId || `manual-${Date.now()}`,
@@ -1026,11 +1033,22 @@ const App: React.FC = () => {
                                     }}
                                     className={`relative w-7 h-7 md:w-8 md:h-8 cursor-pointer group hover:bg-gray-100 rounded-full transition-colors ${isWeeklyMode ? 'opacity-40 cursor-default' : ''}`}
                                 >
-                                    <div className={`absolute inset-0 flex items-center justify-center font-russo text-xs md:text-sm z-10 transition-colors ${isSelected ? 'text-black' : 'text-gray-400 group-hover:text-gray-600'}`}>
+                                    <div 
+                                      className={`absolute w-full h-full flex items-center justify-center font-russo text-xs md:text-sm z-10 transition-colors ${isSelected ? 'text-black' : 'text-gray-400 group-hover:text-gray-600'}`}
+                                      style={{ top: 0, left: 0 }}
+                                    >
                                       {d}
                                     </div>
                                     {isSelected && (
-                                        <div className="absolute inset-0 border-[2px] md:border-[3px] border-black rounded-full transform -rotate-12"></div>
+                                        <div 
+                                          className="absolute border-[2px] md:border-[3px] border-black rounded-full transform -rotate-12"
+                                          style={{ 
+                                            top: 0, 
+                                            left: 0, 
+                                            width: '100%', 
+                                            height: '100%' 
+                                          }}
+                                        ></div>
                                     )}
                                 </div>
                             );
