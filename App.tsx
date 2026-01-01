@@ -352,18 +352,7 @@ const App: React.FC = () => {
         (div as HTMLElement).classList.remove('hidden');
       });
 
-      const originalWidth = plannerRef.current.style.width;
-      const originalMinHeight = plannerRef.current.style.minHeight;
-      const originalMaxWidth = plannerRef.current.style.maxWidth;
-
-      // On mobile, use current viewport width for natural rendering
-      const isMobile = window.innerWidth < 768;
-      if (isMobile) {
-        plannerRef.current.style.width = `${window.innerWidth}px`;
-        plannerRef.current.style.maxWidth = `${window.innerWidth}px`;
-      }
-      plannerRef.current.style.minHeight = 'auto';
-
+      // Don't resize - capture as-is to prevent layout shift
       const scrollContainer = scheduleContainerRef.current;
       const originalHeight = scrollContainer?.style.height;
       const originalOverflow = scrollContainer?.style.overflow;
@@ -376,14 +365,14 @@ const App: React.FC = () => {
       // Small delay to let DOM update
       await new Promise(resolve => setTimeout(resolve, 100));
 
+      const isMobile = window.innerWidth < 768;
       const canvas = await window.html2canvas(plannerRef.current, {
-        scale: isMobile ? 2 : 2,
+        scale: 2,
         backgroundColor: '#ffffff',
         useCORS: true,
         logging: false,
         width: plannerRef.current.offsetWidth,
         height: plannerRef.current.offsetHeight,
-        windowWidth: isMobile ? window.innerWidth : 1200,
         x: 0,
         y: 0
       });
@@ -395,11 +384,6 @@ const App: React.FC = () => {
       printDivs.forEach(div => {
         (div as HTMLElement).classList.add('hidden');
       });
-
-      // Restore original styles
-      plannerRef.current.style.width = originalWidth;
-      plannerRef.current.style.maxWidth = originalMaxWidth;
-      plannerRef.current.style.minHeight = originalMinHeight || '';
 
       if (scrollContainer) {
         scrollContainer.style.height = originalHeight || '';
