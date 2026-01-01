@@ -35,8 +35,8 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
     // Reduced base height (min-h-[44px]) to save vertical space, but allows expansion
     <div className="flex min-h-[44px] border-b border-gray-300 relative group">
       
-      {/* 1. PLAN COLUMN (Left) - Increased to 42% for better writing space */}
-      <div className="w-[42%] border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
+      {/* 1. PLAN COLUMN (Left) - Increased to 50% for mobile, 42% for desktop */}
+      <div className="w-[50%] md:w-[42%] border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
          {/* Render Manual Input (Textarea) if no block here and not covered */}
          {!block && !isCovered && (
             <>
@@ -44,7 +44,7 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                 value={manualPlanText}
                 onChange={(e) => onChangeManualPlan(e.target.value)}
                 placeholder=""
-                className="w-full h-full p-1.5 font-pen text-lg bg-transparent outline-none text-gray-800 placeholder-gray-300 focus:bg-gray-50 transition-colors resize-none leading-tight overflow-hidden z-10"
+                className="w-full h-full p-1 md:p-1.5 font-pen text-base md:text-lg bg-transparent outline-none text-gray-800 placeholder-gray-300 focus:bg-gray-50 transition-colors resize-none leading-tight overflow-hidden z-10"
                 style={{ minHeight: '100%' }}
              />
              {/* Hover button to create a block (Merge slots) */}
@@ -61,7 +61,7 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
          {/* Render Block (Absolute overlay but with text wrapping support) */}
          {block && (
             <div
-                className={`absolute left-0 right-0 top-0 m-0.5 px-2 py-1 flex items-start justify-between cursor-pointer transition-all hover:brightness-95 z-20 shadow-sm border group/block ${CATEGORY_COLORS[block.color as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.other}`}
+                className={`absolute left-0 right-0 top-0 m-0.5 px-1.5 md:px-2 py-1 flex items-start justify-between cursor-pointer transition-all hover:brightness-95 z-20 shadow-md border-2 md:border group/block ${CATEGORY_COLORS[block.color as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.other}`}
                 style={{ 
                   height: `calc(100% * ${block.duration / 30} - 4px)`
                 }}
@@ -70,8 +70,8 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                   if (onEdit) onEdit(block);
                 }}
             >
-                {/* Text styling: smaller font, tight leading, allows wrapping */}
-                <div className="w-[85%] font-pen text-base text-gray-900 leading-tight whitespace-pre-wrap break-words line-clamp-3 pt-0.5 select-none">
+                {/* Text styling: responsive font size, tight leading, allows wrapping */}
+                <div className="w-[85%] font-pen text-sm md:text-base text-gray-900 leading-tight whitespace-pre-wrap break-words line-clamp-3 pt-0.5 select-none">
                   {block.title}
                 </div>
 
@@ -84,28 +84,48 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                       if (onDelete) onDelete(block.id);
                     }}
                     onPointerDown={(e) => e.stopPropagation()} 
-                    className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center text-black/40 hover:text-red-600 hover:bg-white/50 rounded-bl-lg transition-all z-30"
+                    className="absolute top-0 right-0 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center text-black/40 hover:text-red-600 hover:bg-white/50 rounded-bl-lg transition-all z-30"
                     title="Remove Block"
                 >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 </button>
             </div>
          )}
       </div>
 
       {/* 2. TIME COLUMN (Middle) - Compact fixed width */}
-      <div className="w-12 flex-shrink-0 border-r border-gray-300 bg-gray-50 flex items-center justify-center font-russo text-gray-500 text-xs select-none relative">
+      <div className="w-10 md:w-12 flex-shrink-0 border-r border-gray-300 bg-gray-50 flex items-center justify-center font-russo text-gray-500 text-[10px] md:text-xs select-none relative">
         {time}
         {/* Helper line for half hour */}
         {!isHour && <div className="absolute top-0 w-full border-t border-gray-300 opacity-50"></div>}
       </div>
 
-      {/* 3. DO COLUMN (Right) - Remaining space with 4 cells */}
+      {/* 3. DO COLUMN (Right) - 3 cells on mobile, 4 on desktop */}
       <div className="flex-grow flex bg-white relative">
         {!isHour && <div className="absolute inset-0 border-t border-gray-200 border-dashed pointer-events-none"></div>}
         
-        {/* Render 4 Tracker Cells */}
+        {/* Render 3 Tracker Cells on mobile, 4 on desktop */}
         {[0, 1, 2, 3].map((idx) => {
+            // Hide 4th cell on mobile
+            if (idx === 3) {
+              return (
+                <div 
+                    key={idx}
+                    className="hidden md:flex flex-1 border-r border-gray-100 last:border-r-0 relative group transition-colors"
+                >
+                    <textarea 
+                        value={trackerData[idx]?.text || ''}
+                        onChange={(e) => onTrackerTextChange(idx, e.target.value)}
+                        onDoubleClick={() => onTrackerDoubleColor(idx)}
+                        className={`w-full h-full text-center font-pen text-sm outline-none p-1 text-gray-800 placeholder-gray-400/50 resize-none leading-tight flex flex-col justify-center ${trackerData[idx]?.color || 'bg-transparent'}`}
+                        placeholder="" 
+                        rows={1}
+                        style={{ overflow: 'hidden' }}
+                    />
+                </div>
+              );
+            }
+            // Show first 3 cells normally
             const cellData = trackerData[idx] || { color: '', text: '' };
             return (
                 <div 
@@ -116,7 +136,7 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                         value={cellData.text}
                         onChange={(e) => onTrackerTextChange(idx, e.target.value)}
                         onDoubleClick={() => onTrackerDoubleColor(idx)}
-                        className="w-full h-full bg-transparent text-center font-pen text-sm outline-none p-1 text-gray-800 placeholder-gray-400/50 resize-none leading-tight flex flex-col justify-center"
+                        className="w-full h-full bg-transparent text-center font-pen text-xs md:text-sm outline-none p-0.5 md:p-1 text-gray-800 placeholder-gray-400/50 resize-none leading-tight flex flex-col justify-center"
                         placeholder="" 
                         rows={1}
                         style={{ overflow: 'hidden' }}
