@@ -86,33 +86,49 @@ export const useAuth = () => {
     // Listen for auth changes
     if (!supabaseClient) return;
     
-    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          const { data: profile } = await supabaseClient
-            .from('profiles')
-            .select('fighter_name')
-            .eq('id', session.user.id)
-            .single();
-          
-          setAuthState({
-            user: session.user,
-            fighterName: profile?.fighter_name || null,
-            loading: false,
-            error: null,
-          });
-        } else {
-          setAuthState({
-            user: null,
-            fighterName: null,
-            loading: false,
-            error: null,
-          });
+    try {
+      const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
+        async (event, session) => {
+          try {
+            if (session?.user) {
+              const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('fighter_name')
+                .eq('id', session.user.id)
+                .single();
+              
+              setAuthState({
+                user: session.user,
+                fighterName: profile?.fighter_name || null,
+                loading: false,
+                error: null,
+              });
+            } else {
+              setAuthState({
+                user: null,
+                fighterName: null,
+                loading: false,
+                error: null,
+              });
+            }
+          } catch (err) {
+            console.error('Auth state change error:', err);
+            setAuthState(prev => ({
+              ...prev,
+              loading: false,
+            }));
+          }
         }
-      }
-    );
+      );
 
-    return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    } catch (err) {
+      console.error('Failed to setup auth listener:', err);
+      setAuthState(prev => ({
+        ...prev,
+        loading: false,
+      }));
+    }
   }, [useSupabase]);
 
   // Sign up with email
