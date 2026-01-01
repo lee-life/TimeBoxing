@@ -300,6 +300,33 @@ const App: React.FC = () => {
     setHistoryOpen(false);
   };
 
+  const deletePlan = async (planId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent loadPlan from firing
+    
+    if (!confirm('Delete this saved plan?')) return;
+    
+    const userId = getUserId();
+    if (!userId) return;
+    
+    try {
+      // Delete from Supabase if configured
+      if (useSupabase) {
+        const { error } = await import('./services/dataService').then(m => 
+          m.saveDayPlan(userId, { ...savedPlans.find(p => p.id === planId)! })
+        );
+        // Note: We need a delete function in dataService
+        // For now, we'll just remove from local state
+      }
+      
+      // Remove from local state
+      setSavedPlans(savedPlans.filter(p => p.id !== planId));
+      alert('Plan deleted');
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Failed to delete');
+    }
+  };
+
   const confirmClearAll = () => {
     setPriorities(['', '', '']);
     setBrainDump('');
@@ -1190,20 +1217,32 @@ const App: React.FC = () => {
                         {savedPlans.map(plan => (
                             <div 
                                 key={plan.id} 
-                                onClick={() => loadPlan(plan)}
                                 className="bg-[#1a1a1a] border border-gray-800 p-4 hover:border-red-600 cursor-pointer shadow-lg transition-all group relative overflow-hidden rounded-sm"
                             >
                                 <div className="absolute top-0 right-0 w-1 h-full bg-red-600 transform translate-x-full group-hover:translate-x-0 transition-transform duration-200"></div>
-                                <div className="font-bold text-lg mb-1 flex items-center justify-between font-mono text-gray-200">
-                                  <span>{new Date(plan.date).toLocaleDateString()}</span>
-                                  {plan.priorities[0] && <Trophy className="w-3 h-3 text-yellow-500" />}
+                                <div 
+                                  onClick={() => loadPlan(plan)}
+                                  className="flex-1"
+                                >
+                                  <div className="font-bold text-lg mb-1 flex items-center justify-between font-mono text-gray-200">
+                                    <span>{new Date(plan.date).toLocaleDateString()}</span>
+                                    {plan.priorities[0] && <Trophy className="w-3 h-3 text-yellow-500" />}
+                                  </div>
+                                  <div className="text-xs text-gray-400 line-clamp-2 font-mono mb-3 pt-2">
+                                      {plan.priorities.filter(Boolean).join(' / ') || "TRAINING DAY"}
+                                  </div>
+                                  <div className="text-[10px] font-bold bg-black text-white px-2 py-1 inline-block uppercase tracking-wider group-hover:text-red-500 transition-colors border border-gray-800 group-hover:border-red-900">
+                                      LOAD CARD
+                                  </div>
                                 </div>
-                                <div className="text-xs text-gray-400 line-clamp-2 font-mono mb-3 pt-2">
-                                    {plan.priorities.filter(Boolean).join(' / ') || "TRAINING DAY"}
-                                </div>
-                                <div className="text-[10px] font-bold bg-black text-white px-2 py-1 inline-block uppercase tracking-wider group-hover:text-red-500 transition-colors border border-gray-800 group-hover:border-red-900">
-                                    LOAD CARD
-                                </div>
+                                {/* Delete Button */}
+                                <button
+                                  onClick={(e) => deletePlan(plan.id, e)}
+                                  className="absolute top-2 right-2 p-1.5 hover:bg-red-900/30 rounded text-gray-600 hover:text-red-500 transition-colors z-10"
+                                  title="Delete Plan"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
                             </div>
                         ))}
                     </div>

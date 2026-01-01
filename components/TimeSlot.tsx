@@ -45,8 +45,15 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                 onChange={(e) => onChangeManualPlan(e.target.value)}
                 placeholder=""
                 className="w-full h-full p-1 md:p-1.5 font-pen text-base md:text-lg bg-transparent outline-none text-gray-800 placeholder-gray-300 focus:bg-gray-50 transition-colors resize-none leading-tight overflow-hidden z-10"
-                style={{ minHeight: '100%' }}
+                style={{ minHeight: '100%', whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}
              />
+             {/* Hidden div for image capture with proper text rendering */}
+             <div 
+               className="hidden print:block absolute inset-0 p-1 md:p-1.5 font-pen text-base md:text-lg text-gray-800 pointer-events-none leading-tight"
+               style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}
+             >
+               {manualPlanText}
+             </div>
              {/* Hover button to create a block (Merge slots) */}
              <button
                 onClick={onClick}
@@ -108,20 +115,27 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
         {[0, 1, 2, 3].map((idx) => {
             // Hide 4th cell on mobile
             if (idx === 3) {
+              const cellData = trackerData[idx] || { color: '', text: '' };
               return (
                 <div 
                     key={idx}
-                    className="hidden md:flex flex-1 border-r border-gray-100 last:border-r-0 relative group transition-colors"
+                    className={`hidden md:flex flex-1 border-r border-gray-100 last:border-r-0 relative group transition-colors ${cellData.color}`}
                 >
                     <textarea 
-                        value={trackerData[idx]?.text || ''}
+                        value={cellData.text}
                         onChange={(e) => onTrackerTextChange(idx, e.target.value)}
                         onDoubleClick={() => onTrackerDoubleColor(idx)}
-                        className={`w-full h-full text-center font-pen text-sm outline-none p-1 text-gray-800 placeholder-gray-400/50 resize-none leading-tight flex flex-col justify-center ${trackerData[idx]?.color || 'bg-transparent'}`}
+                        className="w-full h-full bg-transparent text-center font-pen text-sm outline-none p-1 text-gray-800 placeholder-gray-400/50 resize-none leading-tight flex flex-col justify-center"
                         placeholder="" 
                         rows={1}
-                        style={{ overflow: 'hidden' }}
+                        style={{ overflow: 'hidden', whiteSpace: 'pre-wrap' }}
                     />
+                    <div 
+                      className="hidden print:block absolute inset-0 text-center font-pen text-sm p-1 text-gray-800 pointer-events-none leading-tight flex flex-col justify-center"
+                      style={{ whiteSpace: 'pre-wrap' }}
+                    >
+                      {cellData.text}
+                    </div>
                 </div>
               );
             }
@@ -139,8 +153,14 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                         className="w-full h-full bg-transparent text-center font-pen text-xs md:text-sm outline-none p-0.5 md:p-1 text-gray-800 placeholder-gray-400/50 resize-none leading-tight flex flex-col justify-center"
                         placeholder="" 
                         rows={1}
-                        style={{ overflow: 'hidden' }}
+                        style={{ overflow: 'hidden', whiteSpace: 'pre-wrap' }}
                     />
+                    <div 
+                      className="hidden print:block absolute inset-0 text-center font-pen text-xs md:text-sm p-0.5 md:p-1 text-gray-800 pointer-events-none leading-tight flex flex-col justify-center"
+                      style={{ whiteSpace: 'pre-wrap' }}
+                    >
+                      {cellData.text}
+                    </div>
                 </div>
             );
         })}
