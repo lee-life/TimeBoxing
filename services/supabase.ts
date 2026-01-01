@@ -19,9 +19,6 @@ if (supabaseUrl && supabaseAnonKey && supabaseUrl !== 'your_supabase_project_url
 // Fallback: null이면 localStorage 모드로 작동
 export const supabaseClient = supabaseInstance;
 
-// Legacy export for backward compatibility
-export const supabase = supabaseClient || ({} as SupabaseClient<Database>);
-
 export const isSupabaseConfigured = () => {
   return supabaseClient !== null;
 };
