@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, AuthError } from '@supabase/supabase-js';
-import { supabase, isSupabaseConfigured } from '../services/supabase';
+import { supabaseClient, isSupabaseConfigured } from '../services/supabase';
 
 interface AuthState {
   user: User | null;
@@ -34,14 +34,24 @@ export const useAuth = () => {
     }
 
     // Supabase mode - get initial session
+    if (!supabaseClient) {
+      setAuthState({
+        user: null,
+        fighterName: null,
+        loading: false,
+        error: null,
+      });
+      return;
+    }
+
     const getSession = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
         
         if (error) throw error;
         
         if (session?.user) {
-          const { data: profile } = await supabase
+          const { data: profile } = await supabaseClient
             .from('profiles')
             .select('fighter_name')
             .eq('id', session.user.id)
@@ -62,6 +72,7 @@ export const useAuth = () => {
           });
         }
       } catch (err) {
+        console.error('Auth error:', err);
         setAuthState(prev => ({
           ...prev,
           loading: false,
@@ -73,7 +84,9 @@ export const useAuth = () => {
     getSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    if (!supabaseClient) return;
+    
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
       async (event, session) => {
         if (session?.user) {
           const { data: profile } = await supabase
@@ -119,8 +132,12 @@ export const useAuth = () => {
       return { error: null };
     }
 
+    if (!supabaseClient) {
+      return { error: { message: 'Supabase not configured' } as AuthError };
+    }
+
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
         options: {
@@ -161,8 +178,12 @@ export const useAuth = () => {
       return { error: null };
     }
 
+    if (!supabaseClient) {
+      return { error: { message: 'Supabase not configured' } as AuthError };
+    }
+
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password,
       });
@@ -226,7 +247,9 @@ export const useAuth = () => {
       return;
     }
 
-    await supabase.auth.signOut();
+    if (supabaseClient) {
+      await supabaseClient.auth.signOut();
+    }
   };
 
   return {

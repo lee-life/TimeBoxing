@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from './supabase';
+import { supabaseClient, isSupabaseConfigured } from './supabase';
 import { DayPlan, ScheduledBlock, TrackerCell } from '../types';
 
 const useSupabase = isSupabaseConfigured();
