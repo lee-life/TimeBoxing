@@ -1,0 +1,131 @@
+import React from 'react';
+import { ScheduledBlock, CATEGORY_COLORS, TrackerCell } from '../types';
+import { Plus, X } from 'lucide-react';
+
+interface TimeSlotProps {
+  time: string;
+  block?: ScheduledBlock;
+  isCovered?: boolean;
+  onClick: () => void;
+  onDelete?: (id: string) => void;
+  onEdit?: (block: ScheduledBlock) => void;
+  isHour: boolean;
+  manualPlanText: string;
+  onChangeManualPlan: (text: string) => void;
+  trackerData?: TrackerCell[];
+  onTrackerDoubleColor: (index: number) => void;
+  onTrackerTextChange: (index: number, text: string) => void;
+}
+
+export const TimeSlot: React.FC<TimeSlotProps> = ({ 
+  time, 
+  block, 
+  isCovered,
+  onClick, 
+  onDelete,
+  onEdit,
+  isHour,
+  manualPlanText,
+  onChangeManualPlan,
+  trackerData = [],
+  onTrackerDoubleColor,
+  onTrackerTextChange
+}) => {
+  return (
+    // Reduced base height (min-h-[44px]) to save vertical space, but allows expansion
+    <div className="flex min-h-[44px] border-b border-gray-300 relative group">
+      
+      {/* 1. PLAN COLUMN (Left) - Increased to 42% for better writing space */}
+      <div className="w-[42%] border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
+         {/* Render Manual Input (Textarea) if no block here and not covered */}
+         {!block && !isCovered && (
+            <>
+             <textarea 
+                value={manualPlanText}
+                onChange={(e) => onChangeManualPlan(e.target.value)}
+                placeholder=""
+                className="w-full h-full p-1.5 font-pen text-lg bg-transparent outline-none text-gray-800 placeholder-gray-300 focus:bg-gray-50 transition-colors resize-none leading-tight overflow-hidden z-10"
+                style={{ minHeight: '100%' }}
+             />
+             {/* Hover button to create a block (Merge slots) */}
+             <button
+                onClick={onClick}
+                className="absolute right-1 top-1 z-20 opacity-0 group-hover/plan:opacity-100 p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-gray-900 transition-all"
+                title="Create Block (Merge Time)"
+             >
+                <Plus className="w-3 h-3" />
+             </button>
+            </>
+         )}
+
+         {/* Render Block (Absolute overlay but with text wrapping support) */}
+         {block && (
+            <div
+                className={`absolute left-0 right-0 top-0 m-0.5 px-2 py-1 flex items-start justify-between cursor-pointer transition-all hover:brightness-95 z-20 shadow-sm border group/block ${CATEGORY_COLORS[block.color as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.other}`}
+                style={{ 
+                  height: `calc(100% * ${block.duration / 30} - 4px)`
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onEdit) onEdit(block);
+                }}
+            >
+                {/* Text styling: smaller font, tight leading, allows wrapping */}
+                <div className="w-[85%] font-pen text-base text-gray-900 leading-tight whitespace-pre-wrap break-words line-clamp-3 pt-0.5 select-none">
+                  {block.title}
+                </div>
+
+                {/* Separate Delete Button - Enhanced for touch/click robustness */}
+                <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      if (onDelete) onDelete(block.id);
+                    }}
+                    onPointerDown={(e) => e.stopPropagation()} 
+                    className="absolute top-0 right-0 w-8 h-8 flex items-center justify-center text-black/40 hover:text-red-600 hover:bg-white/50 rounded-bl-lg transition-all z-30"
+                    title="Remove Block"
+                >
+                    <X className="w-4 h-4" />
+                </button>
+            </div>
+         )}
+      </div>
+
+      {/* 2. TIME COLUMN (Middle) - Compact fixed width */}
+      <div className="w-12 flex-shrink-0 border-r border-gray-300 bg-gray-50 flex items-center justify-center font-russo text-gray-500 text-xs select-none relative">
+        {time}
+        {/* Helper line for half hour */}
+        {!isHour && <div className="absolute top-0 w-full border-t border-gray-300 opacity-50"></div>}
+      </div>
+
+      {/* 3. DO COLUMN (Right) - Remaining space with 4 cells */}
+      <div className="flex-grow flex bg-white relative">
+        {!isHour && <div className="absolute inset-0 border-t border-gray-200 border-dashed pointer-events-none"></div>}
+        
+        {/* Render 4 Tracker Cells */}
+        {[0, 1, 2, 3].map((idx) => {
+            const cellData = trackerData[idx] || { color: '', text: '' };
+            return (
+                <div 
+                    key={idx}
+                    className={`flex-1 border-r border-gray-100 last:border-r-0 relative group transition-colors ${cellData.color}`}
+                >
+                    <textarea 
+                        value={cellData.text}
+                        onChange={(e) => onTrackerTextChange(idx, e.target.value)}
+                        onDoubleClick={() => onTrackerDoubleColor(idx)}
+                        className="w-full h-full bg-transparent text-center font-pen text-sm outline-none p-1 text-gray-800 placeholder-gray-400/50 resize-none leading-tight flex flex-col justify-center"
+                        placeholder="" 
+                        rows={1}
+                        style={{ overflow: 'hidden' }}
+                    />
+                </div>
+            );
+        })}
+      </div>
+      
+    </div>
+  );
+};
