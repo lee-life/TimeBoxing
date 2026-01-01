@@ -309,21 +309,20 @@ const App: React.FC = () => {
     if (!userId) return;
     
     try {
-      // Delete from Supabase if configured
-      if (useSupabase) {
-        const { error } = await import('./services/dataService').then(m => 
-          m.saveDayPlan(userId, { ...savedPlans.find(p => p.id === planId)! })
-        );
-        // Note: We need a delete function in dataService
-        // For now, we'll just remove from local state
+      // Delete from database
+      const { deleteDayPlan } = await import('./services/dataService');
+      const { error } = await deleteDayPlan(userId, planId);
+      
+      if (error) {
+        alert('Failed to delete: ' + error.message);
+        return;
       }
       
       // Remove from local state
       setSavedPlans(savedPlans.filter(p => p.id !== planId));
-      alert('Plan deleted');
     } catch (err) {
       console.error('Delete error:', err);
-      alert('Failed to delete');
+      alert('Failed to delete: ' + (err as Error).message);
     }
   };
 

@@ -70,7 +70,10 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
             <div
                 className={`absolute left-0 right-0 top-0 m-0.5 px-1.5 md:px-2 py-1 flex items-center justify-center cursor-pointer transition-all hover:brightness-95 z-20 shadow-md border-2 md:border group/block ${CATEGORY_COLORS[block.color as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.other}`}
                 style={{ 
-                  height: `calc(100% * ${block.duration / 30} - 4px)`
+                  height: `calc(100% * ${block.duration / 30} - 4px)`,
+                  maxHeight: `calc(100% * ${block.duration / 30} - 4px)`,
+                  minHeight: `calc(100% * ${block.duration / 30} - 4px)`,
+                  overflow: 'hidden'
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -78,7 +81,17 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                 }}
             >
                 {/* Text styling: centered both horizontally and vertically */}
-                <div className="w-[85%] font-pen text-sm md:text-base text-gray-900 leading-tight text-center flex items-center justify-center line-clamp-3 select-none">
+                <div 
+                  className="font-pen text-sm md:text-base text-gray-900 leading-tight text-center select-none"
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    width: '85%'
+                  }}
+                >
                   {block.title}
                 </div>
 
