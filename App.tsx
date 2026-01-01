@@ -821,7 +821,7 @@ const App: React.FC = () => {
                           className="font-pen text-lg sm:text-xl md:text-3xl mb-2 font-bold tracking-normal sm:tracking-wide md:tracking-widest text-right bg-transparent border-b-2 border-transparent hover:border-gray-300 focus:border-black outline-none w-full sm:w-36 md:w-40 transition-colors cursor-text"
                        />
                      )}
-                     <div className="flex gap-2 items-center">
+                     <div className="flex gap-1 md:gap-2 items-center justify-end flex-wrap">
                         {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => {
                             const isSelected = !isWeeklyMode && selectedDayIndex === i;
                             
@@ -831,24 +831,24 @@ const App: React.FC = () => {
                                     onClick={() => {
                                       if (!isWeeklyMode) setSelectedDayIndex(i);
                                     }}
-                                    className={`relative flex items-center justify-center w-8 h-8 cursor-pointer group hover:bg-gray-100 rounded-full transition-colors ${isWeeklyMode ? 'opacity-40 cursor-default' : ''}`}
+                                    className={`relative flex items-center justify-center w-7 h-7 md:w-8 md:h-8 cursor-pointer group hover:bg-gray-100 rounded-full transition-colors ${isWeeklyMode ? 'opacity-40 cursor-default' : ''}`}
                                 >
-                                    <span className={`font-russo text-sm z-10 transition-colors ${isSelected ? 'text-black' : 'text-gray-400 group-hover:text-gray-600'}`}>{d}</span>
+                                    <span className={`font-russo text-xs md:text-sm z-10 transition-colors ${isSelected ? 'text-black' : 'text-gray-400 group-hover:text-gray-600'}`}>{d}</span>
                                     {isSelected && (
-                                        <div className="absolute inset-0 border-[3px] border-black rounded-full transform -rotate-12 scale-110"></div>
+                                        <div className="absolute inset-0 border-[2px] md:border-[3px] border-black rounded-full transform -rotate-12 scale-110"></div>
                                     )}
                                 </div>
                             );
                         })}
                         {/* Weekly Toggle */}
-                        <div className="w-[1px] h-6 bg-gray-300 mx-1"></div>
+                        <div className="w-[1px] h-5 md:h-6 bg-gray-300 mx-0.5 md:mx-1"></div>
                         <div 
                             onClick={() => setIsWeeklyMode(!isWeeklyMode)}
-                            className={`relative flex items-center justify-center w-10 h-8 cursor-pointer group rounded-full transition-all ${isWeeklyMode ? 'bg-black' : 'hover:bg-gray-100'}`}
+                            className={`relative flex items-center justify-center w-8 h-7 md:w-10 md:h-8 cursor-pointer group rounded-full transition-all ${isWeeklyMode ? 'bg-black' : 'hover:bg-gray-100'}`}
                         >
                             <span className={`font-russo text-xs z-10 transition-colors ${isWeeklyMode ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'}`}>W</span>
                             {isWeeklyMode && (
-                                <div className="absolute inset-0 border-[3px] border-black rounded-full transform -rotate-12 scale-110"></div>
+                                <div className="absolute inset-0 border-[2px] md:border-[3px] border-black rounded-full transform -rotate-12 scale-110"></div>
                             )}
                         </div>
                      </div>

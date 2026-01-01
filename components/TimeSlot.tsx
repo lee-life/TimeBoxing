@@ -35,8 +35,8 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
     // Reduced base height (min-h-[44px]) to save vertical space, but allows expansion
     <div className="flex min-h-[44px] border-b border-gray-300 relative group">
       
-      {/* 1. PLAN COLUMN (Left) - Increased to 50% for mobile, 42% for desktop */}
-      <div className="w-[50%] md:w-[42%] border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
+      {/* 1. PLAN COLUMN (Left) - Increased to 55% for mobile, 45% for desktop */}
+      <div className="w-[55%] md:w-[45%] border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
          {/* Render Manual Input (Textarea) if no block here and not covered */}
          {!block && !isCovered && (
             <>
