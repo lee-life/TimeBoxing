@@ -16,7 +16,13 @@ h1, h2, h3, .font-russo {
 }
 
 .font-pen {
-  font-family: 'Nanum Pen Script', cursive;
+  font-family: 'Nanum Pen Script', cursive !important;
+}
+
+/* Force font-pen on all textareas and inputs with font-pen class */
+textarea.font-pen,
+input.font-pen {
+  font-family: 'Nanum Pen Script', cursive !important;
 }
 
 /* Custom Scrollbar */

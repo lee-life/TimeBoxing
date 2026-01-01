@@ -808,9 +808,9 @@ const App: React.FC = () => {
                 </div>
                 
                 {/* Editable Date Section */}
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-end w-full md:w-auto">
                      {isWeeklyMode ? (
-                       <div className="font-pen text-lg sm:text-xl md:text-2xl mb-2 font-bold tracking-wide sm:tracking-widest text-right">
+                       <div className="font-pen text-base sm:text-lg md:text-2xl mb-2 font-bold tracking-normal sm:tracking-wide md:tracking-widest text-right w-full overflow-hidden text-ellipsis whitespace-nowrap">
                          {getWeekDateRange()}
                        </div>
                      ) : (
@@ -818,7 +818,7 @@ const App: React.FC = () => {
                           type="text"
                           value={dateStr}
                           onChange={(e) => setDateStr(e.target.value)}
-                          className="font-pen text-xl sm:text-2xl md:text-3xl mb-2 font-bold tracking-wide sm:tracking-widest text-right bg-transparent border-b-2 border-transparent hover:border-gray-300 focus:border-black outline-none w-32 sm:w-36 md:w-40 transition-colors cursor-text"
+                          className="font-pen text-lg sm:text-xl md:text-3xl mb-2 font-bold tracking-normal sm:tracking-wide md:tracking-widest text-right bg-transparent border-b-2 border-transparent hover:border-gray-300 focus:border-black outline-none w-full sm:w-36 md:w-40 transition-colors cursor-text"
                        />
                      )}
                      <div className="flex gap-2 items-center">
