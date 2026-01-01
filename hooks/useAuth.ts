@@ -89,7 +89,7 @@ export const useAuth = () => {
     const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(
       async (event, session) => {
         if (session?.user) {
-          const { data: profile } = await supabase
+          const { data: profile } = await supabaseClient
             .from('profiles')
             .select('fighter_name')
             .eq('id', session.user.id)
