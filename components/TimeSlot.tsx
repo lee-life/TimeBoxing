@@ -68,28 +68,35 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
          {/* Render Block (Absolute overlay but with text wrapping support) */}
          {block && (
             <div
-                className={`absolute left-0 right-0 top-0 m-0.5 px-1.5 md:px-2 py-1 flex items-center justify-center cursor-pointer transition-all hover:brightness-95 z-20 shadow-md border-2 md:border group/block ${CATEGORY_COLORS[block.color as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.other}`}
+                className={`absolute left-0 right-0 top-0 m-0.5 px-2 py-2 cursor-pointer transition-all hover:brightness-95 z-20 shadow-md border-2 md:border group/block ${CATEGORY_COLORS[block.color as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.other}`}
                 style={{ 
                   height: `calc(100% * ${block.duration / 30} - 4px)`,
                   maxHeight: `calc(100% * ${block.duration / 30} - 4px)`,
                   minHeight: `calc(100% * ${block.duration / 30} - 4px)`,
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center'
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (onEdit) onEdit(block);
                 }}
             >
-                {/* Text styling: centered both horizontally and vertically */}
+                {/* Text styling: centered with proper line clamping */}
                 <div 
-                  className="font-pen text-sm md:text-base text-gray-900 leading-tight text-center select-none"
+                  className="font-pen text-gray-900 text-center select-none w-full"
                   style={{
+                    fontSize: window.innerWidth < 768 ? '0.875rem' : '1rem',
+                    lineHeight: '1.3',
                     display: '-webkit-box',
-                    WebkitLineClamp: 3,
+                    WebkitLineClamp: Math.max(1, Math.floor(block.duration / 20)),
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    width: '85%'
+                    wordBreak: 'break-word',
+                    padding: '0 8px'
                   }}
                 >
                   {block.title}
