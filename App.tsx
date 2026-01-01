@@ -193,26 +193,73 @@ const App: React.FC = () => {
 
     setIsGenerating(true);
     
-    const result = await generateSchedule(inputToUse, schedule);
-    setIsGenerating(false);
-
-    if (result) {
-      if (result.priorities && result.priorities.length > 0) {
-        const newPriorities = [...result.priorities, '', '', ''].slice(0, 3);
-        setPriorities(newPriorities);
+    // Generate sample data immediately
+    const samplePriorities = [
+      '타임박싱 템플릿 만들기',
+      '커서 취미, 통신사 변경',
+      '핸드폰 거치'
+    ];
+    
+    const sampleBlocks: ScheduledBlock[] = [
+      {
+        id: `sample-1-${Date.now()}`,
+        title: '수면',
+        startTime: '06:00',
+        duration: 180,
+        color: 'health'
+      },
+      {
+        id: `sample-2-${Date.now()}`,
+        title: '커서 구독 취소 (레벨업)',
+        startTime: '09:30',
+        duration: 90,
+        color: 'work'
+      },
+      {
+        id: `sample-3-${Date.now()}`,
+        title: '통신제 변경',
+        startTime: '10:30',
+        duration: 90,
+        color: 'work'
+      },
+      {
+        id: `sample-4-${Date.now()}`,
+        title: '타임박싱 개선',
+        startTime: '13:00',
+        duration: 120,
+        color: 'learning'
       }
-      
-      if (result.schedule) {
-        const newBlocks: ScheduledBlock[] = result.schedule.map((item, index) => ({
-          id: `ai-${index}-${Date.now()}`,
-          title: item.title,
-          startTime: item.startTime,
-          duration: item.duration,
-          color: item.category
-        }));
-        setSchedule(newBlocks);
+    ];
+    
+    // Set priorities and schedule
+    setPriorities(samplePriorities);
+    setSchedule(sampleBlocks);
+    
+    // Try AI generation in background (optional)
+    try {
+      const result = await generateSchedule(inputToUse, schedule);
+      if (result) {
+        if (result.priorities && result.priorities.length > 0) {
+          const newPriorities = [...result.priorities, '', '', ''].slice(0, 3);
+          setPriorities(newPriorities);
+        }
+        
+        if (result.schedule) {
+          const newBlocks: ScheduledBlock[] = result.schedule.map((item, index) => ({
+            id: `ai-${index}-${Date.now()}`,
+            title: item.title,
+            startTime: item.startTime,
+            duration: item.duration,
+            color: item.category
+          }));
+          setSchedule(newBlocks);
+        }
       }
+    } catch (error) {
+      console.log('AI generation failed, using sample data');
     }
+    
+    setIsGenerating(false);
   };
 
   const saveToHistory = async () => {
