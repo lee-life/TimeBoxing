@@ -195,38 +195,59 @@ const App: React.FC = () => {
     
     // Generate sample data immediately
     const samplePriorities = [
-      '타임박싱 템플릿 만들기',
-      '커서 취미, 통신사 변경',
-      '핸드폰 거치'
+      '프로젝트 기획서 작성 및 제출',
+      '오후 3시 클라이언트 미팅 준비',
+      '주간 회고 및 다음주 계획'
     ];
     
     const sampleBlocks: ScheduledBlock[] = [
       {
         id: `sample-1-${Date.now()}`,
-        title: '수면',
+        title: '모닝 루틴 및 운동',
         startTime: '06:00',
-        duration: 180,
+        duration: 90,
         color: 'health'
       },
       {
         id: `sample-2-${Date.now()}`,
-        title: '커서 구독 취소 (레벨업)',
-        startTime: '09:30',
-        duration: 90,
+        title: '이메일 확인 및 하루 계획',
+        startTime: '09:00',
+        duration: 30,
         color: 'work'
       },
       {
         id: `sample-3-${Date.now()}`,
-        title: '통신제 변경',
-        startTime: '10:30',
-        duration: 90,
+        title: '프로젝트 기획서 작성',
+        startTime: '09:30',
+        duration: 120,
         color: 'work'
       },
       {
         id: `sample-4-${Date.now()}`,
-        title: '타임박싱 개선',
-        startTime: '13:00',
+        title: '점심 식사',
+        startTime: '12:00',
+        duration: 60,
+        color: 'health'
+      },
+      {
+        id: `sample-5-${Date.now()}`,
+        title: '클라이언트 미팅',
+        startTime: '15:00',
+        duration: 60,
+        color: 'work'
+      },
+      {
+        id: `sample-6-${Date.now()}`,
+        title: '코드 리뷰 및 개발',
+        startTime: '16:00',
         duration: 120,
+        color: 'learning'
+      },
+      {
+        id: `sample-7-${Date.now()}`,
+        title: '주간 회고 작성',
+        startTime: '18:30',
+        duration: 30,
         color: 'learning'
       }
     ];
