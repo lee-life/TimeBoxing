@@ -531,12 +531,6 @@ const App: React.FC = () => {
                     Identify Yourself & Unlock Locker
                 </p>
                 
-                {useSupabase && (
-                  <div className="mb-4 px-3 py-2 bg-emerald-900/30 border border-emerald-700 rounded text-emerald-400 text-xs font-mono">
-                    ☁️ Cloud Sync Enabled
-                  </div>
-                )}
-                
                 <form onSubmit={handleLogin} className="flex flex-col gap-4">
                     <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
