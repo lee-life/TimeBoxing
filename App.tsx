@@ -445,7 +445,7 @@ const App: React.FC = () => {
 
       const isMobile = window.innerWidth < 768;
       const canvas = await window.html2canvas(plannerRef.current, {
-        scale: 1,
+        scale: 3,
         backgroundColor: '#ffffff',
         useCORS: true,
         logging: false,
