@@ -86,10 +86,10 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
             >
                 {/* Text styling: natural wrapping with adequate space */}
                 <div 
-                  className="font-pen text-gray-900 text-center select-none px-2 py-1"
+                  className="font-pen text-gray-900 text-center select-none px-1.5 py-1"
                   style={{
-                    fontSize: window.innerWidth < 768 ? '0.8rem' : '0.9rem',
-                    lineHeight: '1.3',
+                    fontSize: window.innerWidth < 768 ? '0.7rem' : '0.9rem',
+                    lineHeight: '1.25',
                     wordBreak: 'keep-all',
                     overflowWrap: 'anywhere',
                     whiteSpace: 'normal',

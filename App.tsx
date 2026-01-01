@@ -352,10 +352,10 @@ const App: React.FC = () => {
         (div as HTMLElement).classList.remove('hidden');
       });
 
-      // Temporarily adjust PLAN column width for capture (35% → 23%)
+      // Temporarily adjust PLAN column width for capture (55% → 20%)
       const planColumns = plannerRef.current.querySelectorAll('.plan-column');
       planColumns.forEach(col => {
-        (col as HTMLElement).style.width = '23%';
+        (col as HTMLElement).style.width = '20%';
       });
 
       // Save original scroll container state
@@ -377,7 +377,7 @@ const App: React.FC = () => {
 
       const isMobile = window.innerWidth < 768;
       const canvas = await window.html2canvas(plannerRef.current, {
-        scale: 2,
+        scale: 1,
         backgroundColor: '#ffffff',
         useCORS: true,
         logging: false,
