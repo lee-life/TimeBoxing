@@ -35,8 +35,8 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
     // Reduced base height (min-h-[44px]) to save vertical space, but allows expansion
     <div className="flex min-h-[44px] border-b border-gray-300 relative group">
       
-      {/* 1. PLAN COLUMN (Left) - Wide for input (48%), narrow for capture (23%) */}
-      <div className="w-[48%] plan-column border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
+      {/* 1. PLAN COLUMN (Left) - Wide for input (55%), narrow for capture (23%) */}
+      <div className="w-[55%] plan-column border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
          {/* Render Manual Input (Textarea) if no block here and not covered */}
          {!block && !isCovered && (
             <>
@@ -84,19 +84,20 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                   if (onEdit) onEdit(block);
                 }}
             >
-                {/* Text styling: centered with auto-wrap (no ellipsis) */}
+                {/* Text styling: fill entire block, wrap all text */}
                 <div 
-                  className="font-pen text-gray-900 text-center select-none w-full"
+                  className="font-pen text-gray-900 text-center select-none w-full h-full flex items-center justify-center"
                   style={{
-                    fontSize: window.innerWidth < 768 ? '0.75rem' : '0.875rem',
-                    lineHeight: '1.2',
+                    fontSize: window.innerWidth < 768 ? '0.7rem' : '0.8rem',
+                    lineHeight: '1.15',
                     wordBreak: 'break-word',
-                    padding: '0 4px',
+                    padding: '4px 6px',
                     overflowWrap: 'break-word',
-                    hyphens: 'auto'
+                    hyphens: 'auto',
+                    overflow: 'auto'
                   }}
                 >
-                  {block.title}
+                  <span style={{ width: '100%' }}>{block.title}</span>
                 </div>
 
                 {/* Separate Delete Button - Enhanced for touch/click robustness */}
