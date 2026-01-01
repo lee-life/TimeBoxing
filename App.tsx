@@ -352,18 +352,22 @@ const App: React.FC = () => {
         (div as HTMLElement).classList.remove('hidden');
       });
 
-      // Don't resize - capture as-is to prevent layout shift
+      // Save original scroll container state
       const scrollContainer = scheduleContainerRef.current;
       const originalHeight = scrollContainer?.style.height;
       const originalOverflow = scrollContainer?.style.overflow;
+      const originalMaxHeight = scrollContainer?.style.maxHeight;
 
+      // Temporarily expand scroll container to show full content
       if (scrollContainer) {
-        scrollContainer.style.height = 'auto';
+        const fullHeight = scrollContainer.scrollHeight;
+        scrollContainer.style.height = `${fullHeight}px`;
+        scrollContainer.style.maxHeight = 'none';
         scrollContainer.style.overflow = 'visible';
       }
 
-      // Small delay to let DOM update
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Small delay to let DOM stabilize
+      await new Promise(resolve => setTimeout(resolve, 150));
 
       const isMobile = window.innerWidth < 768;
       const canvas = await window.html2canvas(plannerRef.current, {
@@ -372,9 +376,11 @@ const App: React.FC = () => {
         useCORS: true,
         logging: false,
         width: plannerRef.current.offsetWidth,
-        height: plannerRef.current.offsetHeight,
+        height: plannerRef.current.scrollHeight,
         x: 0,
-        y: 0
+        y: 0,
+        windowWidth: plannerRef.current.offsetWidth,
+        windowHeight: plannerRef.current.scrollHeight
       });
 
       // Restore textareas and hide divs
@@ -385,8 +391,10 @@ const App: React.FC = () => {
         (div as HTMLElement).classList.add('hidden');
       });
 
+      // Restore scroll container
       if (scrollContainer) {
         scrollContainer.style.height = originalHeight || '';
+        scrollContainer.style.maxHeight = originalMaxHeight || '';
         scrollContainer.style.overflow = originalOverflow || '';
       }
       
