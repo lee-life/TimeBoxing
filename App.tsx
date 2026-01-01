@@ -289,8 +289,9 @@ const App: React.FC = () => {
       const originalWidth = plannerRef.current.style.width;
       const originalMinHeight = plannerRef.current.style.minHeight; 
 
+      // Force wider view for mobile to capture full content
       if (window.innerWidth < 768) {
-         plannerRef.current.style.width = '800px'; 
+         plannerRef.current.style.width = '1000px'; 
       }
       plannerRef.current.style.minHeight = 'auto';
 
@@ -308,7 +309,9 @@ const App: React.FC = () => {
         backgroundColor: '#ffffff',
         useCORS: true,
         logging: false,
-        windowWidth: 1200,
+        windowWidth: window.innerWidth < 768 ? 1000 : 1200,
+        width: plannerRef.current.scrollWidth,
+        height: plannerRef.current.scrollHeight,
         x: 0,
         y: 0
       });
@@ -325,10 +328,35 @@ const App: React.FC = () => {
       
       setIsGenerating(false);
 
-      const link = document.createElement('a');
-      link.download = `fight-card-${dateStr.replace(/[\/\s,]/g, '-')}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      // Convert to blob for mobile sharing
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        
+        const filename = `fight-card-${dateStr.replace(/[\/\s,]/g, '-')}.png`;
+        
+        // Try Web Share API for mobile (saves to photos)
+        if (navigator.share && navigator.canShare) {
+          try {
+            const file = new File([blob], filename, { type: 'image/png' });
+            await navigator.share({
+              files: [file],
+              title: 'Fight Card',
+              text: 'My Fight Card Plan'
+            });
+            return;
+          } catch (err) {
+            // Fall through to download if share is cancelled or fails
+            console.log('Share cancelled or failed, using download instead');
+          }
+        }
+        
+        // Fallback: Traditional download
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+      }, 'image/png');
     } catch (err) {
       console.error(err);
       setIsGenerating(false);
@@ -769,10 +797,15 @@ const App: React.FC = () => {
                  </button>
                  <button 
                     onClick={downloadImage}
-                    className="p-1.5 md:p-2 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-colors"
+                    disabled={isGenerating}
+                    className="p-1.5 md:p-2 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-colors disabled:opacity-50"
                     title="Export Image"
                  >
-                    <Download className="w-4 h-4 md:w-5 md:h-5" />
+                    {isGenerating ? (
+                      <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4 md:w-5 md:h-5" />
+                    )}
                  </button>
                  {/* Logout Button */}
                  <button 
