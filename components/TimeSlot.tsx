@@ -88,16 +88,16 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                 <div 
                   className="font-pen text-gray-900 text-center select-none w-full h-full flex items-center justify-center"
                   style={{
-                    fontSize: window.innerWidth < 768 ? '0.7rem' : '0.8rem',
-                    lineHeight: '1.15',
-                    wordBreak: 'break-word',
-                    padding: '4px 6px',
+                    fontSize: window.innerWidth < 768 ? '0.75rem' : '0.85rem',
+                    lineHeight: '1.2',
+                    wordBreak: 'keep-all',
                     overflowWrap: 'break-word',
-                    hyphens: 'auto',
-                    overflow: 'auto'
+                    padding: '4px 8px',
+                    hyphens: 'none',
+                    whiteSpace: 'pre-wrap'
                   }}
                 >
-                  <span style={{ width: '100%' }}>{block.title}</span>
+                  <span style={{ width: '100%', display: 'inline-block' }}>{block.title}</span>
                 </div>
 
                 {/* Separate Delete Button - Enhanced for touch/click robustness */}
