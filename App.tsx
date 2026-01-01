@@ -352,6 +352,12 @@ const App: React.FC = () => {
         (div as HTMLElement).classList.remove('hidden');
       });
 
+      // Temporarily adjust PLAN column width for capture (35% → 23%)
+      const planColumns = plannerRef.current.querySelectorAll('.plan-column');
+      planColumns.forEach(col => {
+        (col as HTMLElement).style.width = '23%';
+      });
+
       // Save original scroll container state
       const scrollContainer = scheduleContainerRef.current;
       const originalHeight = scrollContainer?.style.height;
@@ -389,6 +395,11 @@ const App: React.FC = () => {
       });
       printDivs.forEach(div => {
         (div as HTMLElement).classList.add('hidden');
+      });
+
+      // Restore PLAN column width
+      planColumns.forEach(col => {
+        (col as HTMLElement).style.width = '';
       });
 
       // Restore scroll container
