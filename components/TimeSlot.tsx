@@ -84,20 +84,23 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                   if (onEdit) onEdit(block);
                 }}
             >
-                {/* Text styling: fill entire block, wrap all text */}
+                {/* Text styling: natural wrapping with adequate space */}
                 <div 
-                  className="font-pen text-gray-900 text-center select-none w-full h-full flex items-center justify-center"
+                  className="font-pen text-gray-900 text-center select-none px-2 py-1"
                   style={{
-                    fontSize: window.innerWidth < 768 ? '0.75rem' : '0.85rem',
-                    lineHeight: '1.2',
+                    fontSize: window.innerWidth < 768 ? '0.8rem' : '0.9rem',
+                    lineHeight: '1.3',
                     wordBreak: 'keep-all',
-                    overflowWrap: 'break-word',
-                    padding: '4px 8px',
-                    hyphens: 'none',
-                    whiteSpace: 'pre-wrap'
+                    overflowWrap: 'anywhere',
+                    whiteSpace: 'normal',
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}
                 >
-                  <span style={{ width: '100%', display: 'inline-block' }}>{block.title}</span>
+                  {block.title}
                 </div>
 
                 {/* Separate Delete Button - Enhanced for touch/click robustness */}
