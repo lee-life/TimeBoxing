@@ -35,8 +35,8 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
     // Reduced base height (min-h-[44px]) to save vertical space, but allows expansion
     <div className="flex min-h-[44px] border-b border-gray-300 relative group">
       
-      {/* 1. PLAN COLUMN (Left) - Increased to 60% for mobile, 48% for desktop */}
-      <div className="w-[60%] md:w-[48%] border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
+      {/* 1. PLAN COLUMN (Left) - Consistent width across devices */}
+      <div className="w-[48%] border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
          {/* Render Manual Input (Textarea) if no block here and not covered */}
          {!block && !isCovered && (
             <>
@@ -84,19 +84,16 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                   if (onEdit) onEdit(block);
                 }}
             >
-                {/* Text styling: centered with proper line clamping */}
+                {/* Text styling: centered with auto-wrap (no ellipsis) */}
                 <div 
                   className="font-pen text-gray-900 text-center select-none w-full"
                   style={{
-                    fontSize: window.innerWidth < 768 ? '0.875rem' : '1rem',
-                    lineHeight: '1.3',
-                    display: '-webkit-box',
-                    WebkitLineClamp: Math.max(1, Math.floor(block.duration / 20)),
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
+                    fontSize: window.innerWidth < 768 ? '0.75rem' : '0.875rem',
+                    lineHeight: '1.2',
                     wordBreak: 'break-word',
-                    padding: '0 8px'
+                    padding: '0 4px',
+                    overflowWrap: 'break-word',
+                    hyphens: 'auto'
                   }}
                 >
                   {block.title}
