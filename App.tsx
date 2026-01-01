@@ -908,18 +908,41 @@ const App: React.FC = () => {
                            {isWeeklyMode ? 'WEEKLY BRAIN DUMP' : 'BRAIN DUMP'}
                         </div>
                         
-                        {/* Lined Paper Background Effect */}
-                        <textarea
-                            value={isWeeklyMode ? weeklyBrainDump : brainDump}
-                            onChange={(e) => isWeeklyMode ? setWeeklyBrainDump(e.target.value) : setBrainDump(e.target.value)}
-                            className="w-full h-full resize-none outline-none bg-transparent text-xl font-pen leading-[2.5rem] text-gray-800 placeholder-gray-300 p-0"
-                            style={{
-                                backgroundImage: 'linear-gradient(transparent 95%, #e5e7eb 95%)',
-                                backgroundSize: '100% 2.5rem',
-                                lineHeight: '2.5rem'
-                            }}
-                            placeholder={isWeeklyMode ? "• Weekly goals & ideas..." : "• Jot down everything..."}
-                        />
+                        {/* Lined Paper Background Effect with Bullet Points */}
+                        <div className="relative w-full h-full">
+                          <textarea
+                              value={isWeeklyMode ? weeklyBrainDump : brainDump}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                const lines = value.split('\n');
+                                const processedLines = lines.map((line, index) => {
+                                  // Don't add bullet if line already starts with bullet or is empty
+                                  if (index === 0 || line.startsWith('• ') || line.trim() === '') {
+                                    return line;
+                                  }
+                                  // Add bullet to new lines
+                                  return line.startsWith('• ') ? line : '• ' + line;
+                                });
+                                const processed = processedLines.join('\n');
+                                isWeeklyMode ? setWeeklyBrainDump(processed) : setBrainDump(processed);
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  const value = isWeeklyMode ? weeklyBrainDump : brainDump;
+                                  const newValue = value + '\n• ';
+                                  isWeeklyMode ? setWeeklyBrainDump(newValue) : setBrainDump(newValue);
+                                }
+                              }}
+                              className="w-full h-full resize-none outline-none bg-transparent text-xl font-pen leading-[2.5rem] text-gray-800 placeholder-gray-300 p-0"
+                              style={{
+                                  backgroundImage: 'linear-gradient(transparent 95%, #e5e7eb 95%)',
+                                  backgroundSize: '100% 2.5rem',
+                                  lineHeight: '2.5rem'
+                              }}
+                              placeholder={isWeeklyMode ? "• Weekly goals & ideas..." : "• Jot down everything..."}
+                          />
+                        </div>
                     </div>
 
                 </div>
@@ -931,9 +954,11 @@ const App: React.FC = () => {
                          <div className="flex flex-col mb-2">
                             <h3 className="font-russo text-xl uppercase tracking-wide mb-2">WEEK BOX</h3>
                             <div className="flex gap-0 w-full">
-                                 <div className="w-8 text-center font-bold text-[10px] text-gray-500 uppercase border-b border-gray-300 py-1"></div>
-                                 {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day) => (
-                                   <div key={day} className="flex-1 text-center font-bold text-[10px] text-gray-500 uppercase border-b border-gray-300 bg-gray-50/50 py-1">{day}</div>
+                                 <div className="w-16 md:w-20 text-center font-bold text-xs text-gray-500 uppercase border-b border-gray-300 py-1">DAY</div>
+                                 {[1, 2, 3, 4].map((col) => (
+                                   <div key={col} className="flex-1 text-center font-bold text-xs text-gray-500 uppercase border-b border-gray-300 bg-gray-50/50 py-1">
+                                     TASK {col}
+                                   </div>
                                  ))}
                             </div>
                          </div>
@@ -942,37 +967,42 @@ const App: React.FC = () => {
                             ref={scheduleContainerRef}
                             className="flex-grow border-[3px] border-black bg-white overflow-y-auto"
                          >
-                            {/* Weekly rows - 10 rows for tasks */}
-                            {Array.from({ length: 10 }, (_, rowIndex) => (
-                              <div key={rowIndex} className="flex min-h-[50px] border-b border-gray-300 relative group">
-                                {/* Row number */}
-                                <div className="w-8 flex-shrink-0 border-r border-gray-300 bg-gray-50 flex items-center justify-center font-russo text-gray-400 text-xs select-none">
-                                  {rowIndex + 1}
+                            {/* Weekly rows - 7 rows for days */}
+                            {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((dayLabel, dayIndex) => {
+                              const dayKey = dayLabel.toLowerCase().substring(0, 3);
+                              const dayData = weeklyTracker[dayKey] || {};
+                              const rowKey = `row-0`;
+                              const cells = dayData[rowKey] || Array(4).fill({ color: '', text: '' });
+                              
+                              return (
+                                <div key={dayLabel} className="flex min-h-[60px] border-b border-gray-300 relative group">
+                                  {/* Day Label */}
+                                  <div className="w-16 md:w-20 flex-shrink-0 border-r border-gray-300 bg-gray-50 flex items-center justify-center font-russo text-gray-600 text-sm select-none">
+                                    {dayLabel}
+                                  </div>
+                                  {/* 4 Task Cells */}
+                                  {[0, 1, 2, 3].map((cellIndex) => {
+                                    const cellData = cells[cellIndex] || { color: '', text: '' };
+                                    
+                                    return (
+                                      <div 
+                                        key={cellIndex}
+                                        className={`flex-1 border-r border-gray-200 last:border-r-0 relative transition-colors ${cellData.color} ${dayIndex >= 5 ? 'bg-gray-50/30' : ''}`}
+                                      >
+                                        <textarea 
+                                          value={cellData.text}
+                                          onChange={(e) => updateWeeklyTrackerText(dayKey, 0, cellIndex, e.target.value)}
+                                          onDoubleClick={() => updateWeeklyTrackerColor(dayKey, 0, cellIndex)}
+                                          className="w-full h-full bg-transparent text-center font-pen text-sm md:text-base outline-none p-2 text-gray-800 placeholder-gray-400/50 resize-none leading-tight"
+                                          placeholder=""
+                                          style={{ minHeight: '100%' }}
+                                        />
+                                      </div>
+                                    );
+                                  })}
                                 </div>
-                                {/* 7 Day Cells */}
-                                {['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map((day, dayIndex) => {
-                                  const dayData = weeklyTracker[day] || {};
-                                  const rowKey = `row-${rowIndex}`;
-                                  const cellData = dayData[rowKey]?.[0] || { color: '', text: '' };
-                                  
-                                  return (
-                                    <div 
-                                      key={day}
-                                      className={`flex-1 border-r border-gray-200 last:border-r-0 relative transition-colors ${cellData.color} ${dayIndex >= 5 ? 'bg-gray-50/30' : ''}`}
-                                    >
-                                      <textarea 
-                                        value={cellData.text}
-                                        onChange={(e) => updateWeeklyTrackerText(day, rowIndex, 0, e.target.value)}
-                                        onDoubleClick={() => updateWeeklyTrackerColor(day, rowIndex, 0)}
-                                        className="w-full h-full bg-transparent text-center font-pen text-sm outline-none p-1 text-gray-800 placeholder-gray-400/50 resize-none leading-tight"
-                                        placeholder=""
-                                        style={{ minHeight: '100%' }}
-                                      />
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            ))}
+                              );
+                            })}
                          </div>
                        </>
                      ) : (

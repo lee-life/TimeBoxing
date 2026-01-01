@@ -35,8 +35,8 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
     // Reduced base height (min-h-[44px]) to save vertical space, but allows expansion
     <div className="flex min-h-[44px] border-b border-gray-300 relative group">
       
-      {/* 1. PLAN COLUMN (Left) - Increased to 55% for mobile, 45% for desktop */}
-      <div className="w-[55%] md:w-[45%] border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
+      {/* 1. PLAN COLUMN (Left) - Increased to 60% for mobile, 48% for desktop */}
+      <div className="w-[60%] md:w-[48%] border-r border-gray-300 relative bg-white flex flex-col justify-center group/plan">
          {/* Render Manual Input (Textarea) if no block here and not covered */}
          {!block && !isCovered && (
             <>
@@ -61,7 +61,7 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
          {/* Render Block (Absolute overlay but with text wrapping support) */}
          {block && (
             <div
-                className={`absolute left-0 right-0 top-0 m-0.5 px-1.5 md:px-2 py-1 flex items-start justify-between cursor-pointer transition-all hover:brightness-95 z-20 shadow-md border-2 md:border group/block ${CATEGORY_COLORS[block.color as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.other}`}
+                className={`absolute left-0 right-0 top-0 m-0.5 px-1.5 md:px-2 py-1 flex items-center justify-center cursor-pointer transition-all hover:brightness-95 z-20 shadow-md border-2 md:border group/block ${CATEGORY_COLORS[block.color as keyof typeof CATEGORY_COLORS] || CATEGORY_COLORS.other}`}
                 style={{ 
                   height: `calc(100% * ${block.duration / 30} - 4px)`
                 }}
@@ -70,8 +70,8 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
                   if (onEdit) onEdit(block);
                 }}
             >
-                {/* Text styling: responsive font size, tight leading, allows wrapping */}
-                <div className="w-[85%] font-pen text-sm md:text-base text-gray-900 leading-tight whitespace-pre-wrap break-words line-clamp-3 pt-0.5 select-none">
+                {/* Text styling: centered both horizontally and vertically */}
+                <div className="w-[85%] font-pen text-sm md:text-base text-gray-900 leading-tight text-center flex items-center justify-center line-clamp-3 select-none">
                   {block.title}
                 </div>
 
