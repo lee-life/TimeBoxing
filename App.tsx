@@ -226,7 +226,7 @@ const App: React.FC = () => {
       if (isWeeklyMode) {
         // Save weekly plan
         const newWeeklyPlan: WeeklyPlan = {
-          id: Date.now().toString(),
+          id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
           weekStart: getWeekDateRange(),
           priorities: weeklyPriorities,
           brainDump: weeklyBrainDump,
@@ -244,7 +244,7 @@ const App: React.FC = () => {
       } else {
         // Save daily plan
         const newPlan: DayPlan = {
-          id: Date.now().toString(),
+          id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
           date: dateStr, 
           priorities,
           brainDump,
@@ -315,6 +315,17 @@ const App: React.FC = () => {
     try {
       setIsGenerating(true); 
 
+      // Hide textareas and show divs for proper line break rendering
+      const textareas = plannerRef.current.querySelectorAll('textarea');
+      const printDivs = plannerRef.current.querySelectorAll('.print\\:block');
+      
+      textareas.forEach(ta => {
+        (ta as HTMLElement).style.display = 'none';
+      });
+      printDivs.forEach(div => {
+        (div as HTMLElement).classList.remove('hidden');
+      });
+
       const originalWidth = plannerRef.current.style.width;
       const originalMinHeight = plannerRef.current.style.minHeight;
       const originalMaxWidth = plannerRef.current.style.maxWidth;
@@ -349,6 +360,14 @@ const App: React.FC = () => {
         windowWidth: isMobile ? window.innerWidth : 1200,
         x: 0,
         y: 0
+      });
+
+      // Restore textareas and hide divs
+      textareas.forEach(ta => {
+        (ta as HTMLElement).style.display = '';
+      });
+      printDivs.forEach(div => {
+        (div as HTMLElement).classList.add('hidden');
       });
 
       // Restore original styles
@@ -912,7 +931,7 @@ const App: React.FC = () => {
                                 >
                                     <span className={`font-russo text-xs md:text-sm z-10 transition-colors ${isSelected ? 'text-black' : 'text-gray-400 group-hover:text-gray-600'}`}>{d}</span>
                                     {isSelected && (
-                                        <div className="absolute inset-0 border-[2px] md:border-[3px] border-black rounded-full transform -rotate-12 scale-110"></div>
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full border-[2px] md:border-[3px] border-black rounded-full transform -rotate-12"></div>
                                     )}
                                 </div>
                             );
@@ -925,7 +944,7 @@ const App: React.FC = () => {
                         >
                             <span className={`font-russo text-xs z-10 transition-colors ${isWeeklyMode ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'}`}>W</span>
                             {isWeeklyMode && (
-                                <div className="absolute inset-0 border-[2px] md:border-[3px] border-black rounded-full transform -rotate-12 scale-110"></div>
+                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full border-[2px] md:border-[3px] border-black rounded-full transform -rotate-12"></div>
                             )}
                         </div>
                      </div>
@@ -1017,10 +1036,24 @@ const App: React.FC = () => {
                                   backgroundSize: '100% 2.5rem',
                                   lineHeight: '2.5rem',
                                   whiteSpace: 'pre-wrap',
-                                  wordWrap: 'break-word'
+                                  wordWrap: 'break-word',
+                                  overflow: 'auto'
                               }}
                               placeholder={isWeeklyMode ? "• Weekly goals & ideas..." : "• Jot down everything..."}
                           />
+                          {/* Hidden div for image capture with proper line breaks */}
+                          <div 
+                            className="hidden print:block absolute inset-0 text-xl font-pen leading-[2.5rem] text-gray-800 p-0 pointer-events-none"
+                            style={{
+                              backgroundImage: 'linear-gradient(transparent 95%, #e5e7eb 95%)',
+                              backgroundSize: '100% 2.5rem',
+                              lineHeight: '2.5rem',
+                              whiteSpace: 'pre-wrap',
+                              wordWrap: 'break-word'
+                            }}
+                          >
+                            {(isWeeklyMode ? weeklyBrainDump : brainDump) || (isWeeklyMode ? "• Weekly goals & ideas..." : "• Jot down everything...")}
+                          </div>
                         </div>
                     </div>
 
