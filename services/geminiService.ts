@@ -1,7 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { SuggestionResponse } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+// Only initialize if API key is available
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const generateSchedule = async (
   brainDump: string,
@@ -9,6 +12,11 @@ export const generateSchedule = async (
   startHour: string = "06:00",
   endHour: string = "23:00"
 ): Promise<SuggestionResponse | null> => {
+  if (!ai || !apiKey) {
+    console.warn('Gemini API key not configured. AI scheduling is disabled.');
+    return null;
+  }
+
   try {
     const prompt = `
       Act as a strict but encouraging Boxing Coach managing my time.
