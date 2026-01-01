@@ -217,28 +217,57 @@ const App: React.FC = () => {
 
   const saveToHistory = async () => {
     const userId = getUserId();
-    if (!userId) return;
-
-    const newPlan: DayPlan = {
-      id: Date.now().toString(),
-      date: dateStr, 
-      priorities,
-      brainDump,
-      schedule,
-      tracker,
-      manualPlans
-    };
-    
-    const { error } = await saveDayPlan(userId, newPlan);
-    
-    if (error) {
-      alert("Failed to save: " + error.message);
+    if (!userId) {
+      alert("Please log in to save");
       return;
     }
-    
-    const updatedHistory = [newPlan, ...savedPlans.filter(p => p.id !== newPlan.id)];
-    setSavedPlans(updatedHistory);
-    alert("Plan Saved to Locker Room!");
+
+    try {
+      if (isWeeklyMode) {
+        // Save weekly plan
+        const newWeeklyPlan: WeeklyPlan = {
+          id: Date.now().toString(),
+          weekStart: getWeekDateRange(),
+          priorities: weeklyPriorities,
+          brainDump: weeklyBrainDump,
+          tracker: weeklyTracker
+        };
+        
+        const { error } = await saveWeeklyPlan(userId, newWeeklyPlan);
+        
+        if (error) {
+          alert("Failed to save: " + error.message);
+          return;
+        }
+        
+        alert("Weekly Plan Saved!");
+      } else {
+        // Save daily plan
+        const newPlan: DayPlan = {
+          id: Date.now().toString(),
+          date: dateStr, 
+          priorities,
+          brainDump,
+          schedule,
+          tracker,
+          manualPlans
+        };
+        
+        const { error } = await saveDayPlan(userId, newPlan);
+        
+        if (error) {
+          alert("Failed to save: " + error.message);
+          return;
+        }
+        
+        const updatedHistory = [newPlan, ...savedPlans.filter(p => p.id !== newPlan.id)];
+        setSavedPlans(updatedHistory);
+        alert("Plan Saved to Locker Room!");
+      }
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("Failed to save: " + (err as Error).message);
+    }
   };
 
   const loadPlan = (plan: DayPlan) => {
@@ -287,11 +316,14 @@ const App: React.FC = () => {
       setIsGenerating(true); 
 
       const originalWidth = plannerRef.current.style.width;
-      const originalMinHeight = plannerRef.current.style.minHeight; 
+      const originalMinHeight = plannerRef.current.style.minHeight;
+      const originalMaxWidth = plannerRef.current.style.maxWidth;
 
-      // Force wider view for mobile to capture full content
-      if (window.innerWidth < 768) {
-         plannerRef.current.style.width = '1000px'; 
+      // On mobile, use current viewport width for natural rendering
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        plannerRef.current.style.width = `${window.innerWidth}px`;
+        plannerRef.current.style.maxWidth = `${window.innerWidth}px`;
       }
       plannerRef.current.style.minHeight = 'auto';
 
@@ -304,21 +336,24 @@ const App: React.FC = () => {
         scrollContainer.style.overflow = 'visible';
       }
 
+      // Small delay to let DOM update
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const canvas = await window.html2canvas(plannerRef.current, {
-        scale: 2,
+        scale: isMobile ? 2 : 2,
         backgroundColor: '#ffffff',
         useCORS: true,
         logging: false,
-        windowWidth: window.innerWidth < 768 ? 1000 : 1200,
-        width: plannerRef.current.scrollWidth,
-        height: plannerRef.current.scrollHeight,
+        width: plannerRef.current.offsetWidth,
+        height: plannerRef.current.offsetHeight,
+        windowWidth: isMobile ? window.innerWidth : 1200,
         x: 0,
         y: 0
       });
 
-      if (window.innerWidth < 768) {
-        plannerRef.current.style.width = originalWidth;
-      }
+      // Restore original styles
+      plannerRef.current.style.width = originalWidth;
+      plannerRef.current.style.maxWidth = originalMaxWidth;
       plannerRef.current.style.minHeight = originalMinHeight || '';
 
       if (scrollContainer) {
@@ -334,28 +369,37 @@ const App: React.FC = () => {
         
         const filename = `fight-card-${dateStr.replace(/[\/\s,]/g, '-')}.png`;
         
-        // Try Web Share API for mobile (saves to photos)
-        if (navigator.share && navigator.canShare) {
+        // Try Web Share API for mobile (directly saves to photos without extra click)
+        if (isMobile && navigator.share && navigator.canShare) {
           try {
             const file = new File([blob], filename, { type: 'image/png' });
-            await navigator.share({
-              files: [file],
-              title: 'Fight Card',
-              text: 'My Fight Card Plan'
-            });
-            return;
-          } catch (err) {
-            // Fall through to download if share is cancelled or fails
-            console.log('Share cancelled or failed, using download instead');
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: 'Fight Card'
+              });
+              return;
+            }
+          } catch (err: any) {
+            // User cancelled or error - fall through to download
+            if (err.name !== 'AbortError') {
+              console.error('Share failed:', err);
+            }
           }
         }
         
-        // Fallback: Traditional download
+        // Fallback: Traditional download with better mobile handling
+        const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.download = filename;
-        link.href = URL.createObjectURL(blob);
+        link.href = url;
+        link.style.display = 'none';
+        document.body.appendChild(link);
         link.click();
-        URL.revokeObjectURL(link.href);
+        document.body.removeChild(link);
+        
+        // Clean up after a delay
+        setTimeout(() => URL.revokeObjectURL(url), 100);
       }, 'image/png');
     } catch (err) {
       console.error(err);
@@ -971,7 +1015,9 @@ const App: React.FC = () => {
                               style={{
                                   backgroundImage: 'linear-gradient(transparent 95%, #e5e7eb 95%)',
                                   backgroundSize: '100% 2.5rem',
-                                  lineHeight: '2.5rem'
+                                  lineHeight: '2.5rem',
+                                  whiteSpace: 'pre-wrap',
+                                  wordWrap: 'break-word'
                               }}
                               placeholder={isWeeklyMode ? "• Weekly goals & ideas..." : "• Jot down everything..."}
                           />
